@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sports Manager PRO | ระบบจัดการแข่งขันและนับคะแนน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styly.css">
+</head>
+<body class="min-h-screen p-2 md:p-6 text-slate-200 overflow-x-hidden">
+    
+   <canvas id="confetti-canvas"></canvas>
+
+   <!-- ปุ่มลอยสำหรับออกจากโหมดเต็มจอ -->
+   <button id="exit-fs-floating-btn" onclick="toggleFullscreen()" 
+           class="fixed top-4 right-4 z-50 w-12 h-12 bg-slate-700/80 backdrop-blur-md border border-slate-500 rounded-full items-center justify-center text-white shadow-2xl active:scale-90 transition-all">
+       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg>
+   </button>
+
+   <div id="app-wrapper" class="max-w-7xl mx-auto flex flex-col h-full gap-4">
+       
+       <!-- ส่วนหัวและการตั้งค่า -->
+       <header id="main-header" class="bg-slate-800/50 backdrop-blur-md rounded-3xl shadow-xl p-6 border border-slate-700">
+           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+               <div>
+                   <h1 class="text-2xl font-extrabold text-white tracking-tight">Sports Manager <span class="text-blue-500">PRO</span></h1>
+                   <p class="text-slate-400 text-sm">จัดการแข่งขันและนับคะแนนครบวงจร</p>
+               </div>
+               
+               <div class="flex flex-wrap gap-3 items-end">
+                   <div class="flex-1 min-w-[100px]">
+                       <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-widest">เป้าหมายแต้ม</label>
+                       <input type="number" id="targetScore" value="21" min="1" 
+                              class="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold">
+                   </div>
+                   <button id="toggle-view-btn" onclick="switchView()" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95">
+                       จัดการแข่งขัน
+                   </button>
+                   <button onclick="toggleFullscreen()" class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95">
+                       <span id="fs-btn-text">เต็มจอ</span>
+                   </button>
+               </div>
+           </div>
+       </header>
+
+       <!-- แถบเลือกโหมดการแข่ง -->
+       <div class="view-tabs flex flex-wrap gap-4 md:gap-8 border-b border-slate-700 px-6">
+           <button onclick="changeMode('round-robin')" id="tab-rr" class="pb-2 font-bold tab-active transition-all">พบกันหมด (Round Robin)</button>
+           <button onclick="changeMode('tournament')" id="tab-tm" class="pb-2 font-bold text-slate-500 transition-all">ทัวร์นาเมนต์ (Bracket)</button>
+           <button onclick="changeMode('quick-score')" id="tab-qs" class="pb-2 font-bold text-slate-500 transition-all">นับคะแนนทันที (Quick Score)</button>
+       </div>
+
+       <!-- หน้าตั้งค่า (Setup View) -->
+       <section id="setup-view" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4">
+           <!-- เพิ่มรายชื่อทีม -->
+           <div class="bg-slate-800/50 p-6 rounded-[2rem] border border-slate-700">
+               <div id="standard-setup">
+                   <h3 class="text-xl font-bold mb-4 text-blue-400">1. รายชื่อผู้เข้าแข่งขัน</h3>
+                   <div class="flex gap-2 mb-4">
+                       <input type="text" id="pairNameInput" placeholder="ชื่อทีม/คู่" 
+                              class="flex-grow px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white">
+                       <button onclick="addPair()" class="px-4 py-2 bg-emerald-600 rounded-xl font-bold hover:bg-emerald-500 transition-all">+</button>
+                   </div>
+                   <div id="pairsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div>
+                   
+                   <div id="rr-actions">
+                       <button onclick="generateSchedule()" class="w-full mt-4 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold transition-all shadow-lg">
+                           สร้างตารางแบบพบกันหมด
+                       </button>
+                   </div>
+                   <div id="tm-actions" class="hidden">
+                       <button onclick="generateTournament()" class="w-full mt-4 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl font-bold transition-all shadow-lg">
+                           สร้างสายการแข่ง (Bracket)
+                       </button>
+                   </div>
+               </div>
+
+               <div id="qs-setup" class="hidden">
+                   <h3 class="text-xl font-bold mb-4 text-cyan-400">นับคะแนนทันที</h3>
+                   <div class="space-y-4">
+                       <div>
+                           <label class="block text-xs text-slate-400 mb-1 uppercase">ทีม A / ฝั่งซ้าย</label>
+                           <input type="text" id="qs-name-a" value="ทีม A" 
+                                  class="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold">
+                       </div>
+                       <div>
+                           <label class="block text-xs text-slate-400 mb-1 uppercase">ทีม B / ฝั่งขวา</label>
+                           <input type="text" id="qs-name-b" value="ทีม B" 
+                                  class="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold">
+                       </div>
+                       <button onclick="startQuickMatch()" class="w-full mt-4 py-4 bg-cyan-600 hover:bg-cyan-500 rounded-xl font-black text-lg transition-all shadow-lg active:scale-95">
+                           เริ่มนับคะแนน
+                       </button>
+                   </div>
+               </div>
+           </div>
+
+           <!-- ส่วนแสดงตารางหรือสายการแข่ง -->
+           <div class="lg:col-span-2 bg-slate-800/50 p-6 rounded-[2rem] border border-slate-700 flex flex-col h-full min-h-[300px]">
+               <h3 class="text-xl font-bold mb-4 text-amber-400" id="schedule-title">ลำดับการแข่งขัน</h3>
+               <div id="scheduleContainer" class="space-y-3 overflow-y-auto custom-scrollbar flex-grow max-h-[500px] pr-2">
+                   <p class="text-slate-500 text-center py-10">กรุณาเพิ่มชื่อและกดสร้างตาราง</p>
+               </div>
+           </div>
+       </section>
+
+       <!-- หน้ากระดานคะแนน (Scoreboard View) -->
+       <section id="scoreboard-view" class="flex-grow flex flex-col justify-center">
+           <div id="match-info" class="text-center mb-4 hidden">
+               <span id="round-tag" class="bg-slate-700 text-slate-300 px-3 py-1 rounded-l-full text-xs font-bold border border-slate-600 uppercase">รอบที่ -</span>
+               <span class="bg-indigo-600/30 text-indigo-400 px-4 py-1 rounded-r-full text-sm font-bold border border-indigo-500/30 border-l-0">
+                   แมตช์: <span id="current-match-label">-</span>
+               </span>
+           </div>
+           <div id="scoreboard-container" class="grid gap-4 items-stretch content-center"></div>
+       </section>
+
+   </div>
+
+   <!-- หน้าต่างแจ้งเตือนผู้ชนะ (Winner Modal) -->
+   <div id="winnerModal" class="fixed inset-0 bg-black/80 backdrop-blur-xl hidden flex items-center justify-center z-50 p-6">
+       <div class="bg-slate-800 rounded-[3rem] p-10 max-w-sm w-full shadow-2xl text-center border border-slate-700">
+           <div class="text-7xl mb-4">👑</div>
+           <h2 class="text-4xl font-black text-white mb-2 uppercase tracking-tighter">ผู้ชนะ!</h2>
+           <p id="winnerMessage" class="text-slate-300 mb-8 text-xl font-medium"></p>
+           <button onclick="closeModal()" class="w-full py-5 bg-green-600 hover:bg-green-500 text-white font-black rounded-2xl transition-all shadow-xl active:scale-95 text-2xl">
+               บันทึกผล
+           </button>
+       </div>
+   </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
