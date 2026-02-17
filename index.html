@@ -16,7 +16,7 @@
   <!-- สีแถบเบราว์เซอร์สำหรับ Android -->
 
   <!-- ลิงก์ไปยัง Icon สำหรับ iOS (ถ้าไม่มีไฟล์ภาพจริง ระบบจะดึงจาก Manifest แต่อันนี้ช่วยให้ชัดเจนขึ้น) -->
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5351/5351486.png" />
+  <link rel="apple-touch-icon" href="public/favicon_io/apple-touch-icon.png" />
 
   <!-- ลิงก์ไปยังไฟล์ Manifest ที่เราสร้างไว้ -->
   <link rel="manifest" href="manifest.json" />
@@ -202,6 +202,10 @@
     </section>
   </div>
 
+  <footer class="text-center text-slate-500 text-xs py-4">
+    Version <span id="app-version">1.0.1</span>
+  </footer>
+
   <!-- Theme Modal -->
   <div id="themeModal"
     class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-[60] p-6">
@@ -253,7 +257,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=1.0.1"></script>
 </body>
 
 </html>
