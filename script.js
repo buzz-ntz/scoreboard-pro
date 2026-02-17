@@ -26,7 +26,31 @@
      const ctx = canvas.getContext('2d');
      let particles = [];
      function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-     window.addEventListener('resize', resizeCanvas);
+
+     function getOrientationGridClass() {
+         if (window.matchMedia("(orientation: landscape)").matches) {
+             return "grid-cols-2"; // Landscape: side-by-side
+         } else {
+             return "grid-cols-1"; // Portrait: top-bottom
+         }
+     }
+
+     function getScoreFontSizeClass() {
+         const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+         if (isLandscape) {
+             return isFullscreenMode ? 'text-[clamp(10rem,35vh,25rem)]' : 'text-8xl md:text-9xl';
+         } else {
+             return isFullscreenMode ? 'text-[clamp(8rem,20vh,15rem)]' : 'text-7xl';
+         }
+     }
+
+     function handleResizeAndOrientation() {
+         resizeCanvas();
+         if (currentView === 'scoreboard') {
+             renderScoreboard();
+         }
+     }
+     window.addEventListener('resize', handleResizeAndOrientation);
      resizeCanvas();
 
      function createConfetti() {
@@ -197,10 +221,10 @@
          if (!m) return container.innerHTML = `<div class="text-center py-20 bg-slate-800/30 rounded-[3rem] border-dashed border-2 border-slate-700"><p class="text-slate-500 mb-4 font-bold">โปรดเลือกแมตช์</p><button onclick="switchView('setup')" class="bg-blue-600 px-8 py-3 rounded-2xl font-bold text-white shadow-lg">ไปที่หน้าตั้งค่า</button></div>`;
          const cfg = themeConfig[activeTheme];
          const sides = [{ name: m.teamA.name, score: m.scoreA, isB: false, color: '#3b82f6' }, { name: m.teamB.name, score: m.scoreB, isB: true, color: '#ef4444' }];
-         let grid = isFullscreenMode ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2";
+         let grid = getOrientationGridClass();
          container.className = `flex-grow grid gap-4 ${grid}`;
          container.innerHTML = sides.map(s => {
-             const sz = isFullscreenMode ? 'text-[clamp(10rem,35vh,25rem)]' : 'text-8xl md:text-9xl';
+             const sz = getScoreFontSizeClass();
              let scoreStyle = (activeTheme === 'default' || activeTheme === 'light') ? `color: ${s.color}` : '';
              return `<div class="score-card relative flex flex-col ${cfg.card} rounded-[2.5rem] overflow-hidden border-2"><div class="p-4 text-center font-black text-2xl uppercase tracking-tighter truncate" style="${activeTheme === 'default' ? 'background-color:' + s.color + '22;' : ''} ${activeTheme === 'light' ? 'color:#1e293b' : ''}">${escapeHTML(s.name)}</div><div onclick="changeScore(${s.isB}, 1)" class="flex-grow flex items-center justify-center cursor-pointer tap-target select-none transition-colors active:bg-slate-200/10"><div id="score-val-${s.isB}" class="${sz} font-black leading-none ${cfg.score}" style="${scoreStyle}">${s.score}</div></div><div class="p-6 grid grid-cols-2 gap-4"><button onclick="event.stopPropagation(); changeScore(${s.isB}, -1)" class="py-6 bg-slate-700/50 rounded-2xl text-3xl font-bold active:scale-95 transition-all text-white border border-slate-600">-</button><button onclick="event.stopPropagation(); changeScore(${s.isB}, 1)" class="py-6 rounded-2xl text-5xl font-black active:scale-95 shadow-2xl transition-all text-white" style="${activeTheme === 'high-contrast' ? 'background:#fbbf24;color:#000' : 'background:' + s.color}">+</button></div></div>`;
          }).join('');
