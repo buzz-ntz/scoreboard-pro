@@ -5,7 +5,7 @@ const escapeHTML = (str) => {
     return p.innerHTML;
 };
 
-const APP_VERSION = "1.0.1"; // Define app version here
+const APP_VERSION = "1.0.2"; // Define app version here
 let currentTargetScore = 15; // Default target score
 
 let pairs = [{ id: 1, name: "คู่ A" }, { id: 2, name: "คู่ B" }, { id: 3, name: "คู่ C" }, { id: 4, name: "คู่ D" }];
@@ -52,9 +52,9 @@ function getOrientationGridClass() {
 function getScoreFontSizeClass() {
     const isLandscape = window.matchMedia("(orientation: landscape)").matches;
     if (isLandscape) {
-        return isFullscreenMode ? 'text-[clamp(10rem,35vh,25rem)]' : 'text-8xl md:text-9xl';
+        return isFullscreenMode ? 'text-[clamp(10rem,35vh,25rem)]' : 'text-9xl';
     } else {
-        return isFullscreenMode ? 'text-[clamp(8rem,20vh,15rem)]' : 'text-7xl';
+        return isFullscreenMode ? 'text-[clamp(8rem,20vh,15rem)]' : 'text-9xl';
     }
 }
 
@@ -248,7 +248,7 @@ function renderScoreboard() {
     }).join('');
 }
 
-function toggleFullscreen() { isFullscreenMode = !isFullscreenMode; document.body.classList.toggle('fullscreen-active', isFullscreenMode); document.getElementById('fs-btn-text').innerText = isFullscreenMode ? "ย่อหน้า" : "เต็มจอ"; document.getElementById('exit-fs-floating-btn').classList.toggle('hidden', !isFullscreenMode); renderScoreboard(); }
+function toggleFullscreen() { isFullscreenMode = !isFullscreenMode; document.body.classList.toggle('fullscreen-active', isFullscreenMode); document.getElementById('fs-btn-text').innerText = isFullscreenMode ? "ย่อหน้า" : "เต็มจอ"; document.getElementById('exit-fs-floating-btn').classList.toggle('hidden', !isFullscreenMode); document.getElementById('fs-btn').classList.toggle('hidden', isFullscreenMode); renderScoreboard(); }
 function closeModal() { const modal = document.getElementById('winnerModal'); modal.classList.remove('flex'); modal.classList.add('hidden'); isGameOver = false; particles = []; ctx.clearRect(0, 0, canvas.width, canvas.height); if (isFullscreenMode) toggleFullscreen(); switchView('setup'); }
 window.onload = () => {
     resizeCanvas();
