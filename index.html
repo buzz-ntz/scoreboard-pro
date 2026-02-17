@@ -13,9 +13,9 @@
   <meta name="theme-color" content="#0f172a" />
 
   <!-- Favicons for all devices -->
-  <link rel="icon" href="/assets/favicon_io/favicon.ico" sizes="any">
-  <link rel="icon" href="/assets/favicon_io/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/favicon_io/apple-touch-icon.png" />
+  <link rel="icon" href="/public/favicon_io/favicon.ico" sizes="any">
+  <link rel="icon" href="/public/favicon_io/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/public/favicon_io/apple-touch-icon.png" />
 
   <!-- Web App Manifest -->
   <link rel="manifest" href="manifest.json" />
@@ -34,7 +34,7 @@
   <div id="app-wrapper" class="max-w-7xl mx-auto flex flex-col h-full gap-4">
     <header id="main-header"
       class="bg-slate-800/50 backdrop-blur-md rounded-3xl shadow-xl p-6 border border-slate-700 transition-all">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="cursor-pointer" onclick="switchView('home')">
           <h1 class="text-2xl font-extrabold text-white tracking-tight">
             Sports Manager <span class="text-blue-500">PRO</span>
@@ -44,29 +44,33 @@
           </p>
         </div>
         <div class="flex flex-wrap gap-3 items-end">
-          <div id="target-score-wrapper" class="flex-1 min-w-[80px] hidden">
+          <div id="header-target-score-display" class="flex-1 min-w-[80px] hidden text-center">
             <label
               class="block text-[10px] font-medium text-slate-400 mb-1 uppercase tracking-widest">แต้มเป้าหมาย</label>
-            <input type="number" id="targetScore" value="15" min="1" max="999"
-              class="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold focus:border-blue-500 transition-colors" />
+            <span id="displayTargetScore"
+              class="w-full px-4 py-0 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold">15</span>
           </div>
-          <button id="theme-btn" onclick="openThemeModal()"
-            class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl flex items-center gap-2 hidden">
-            <span>🎨 ธีม</span>
-          </button>
           <button id="home-nav-btn" onclick="switchView('home')"
             class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl flex items-center gap-2 hidden">
             <span>🏠 หน้าหลัก</span>
+          </button>
+          <button id="settings-btn" onclick="openSettingsModal()"
+            class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl flex items-center gap-2">
+            <span>⚙️ ตั้งค่า</span>
           </button>
           <button id="toggle-view-btn" onclick="switchView('setup')"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl hidden transition-colors shadow-lg">
             จัดการแข่งขัน
           </button>
-          <button id="fs-btn" onclick="toggleFullscreen()"
-            class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white font-bold rounded-xl hidden">
-            <span id="fs-btn-text">เต็มจอ</span>
-          </button>
+          <div class="flex items-end">
+            <button id="fs-btn" onclick="toggleFullscreen()"
+              class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white font-bold rounded-xl hidden">
+              <span id="fs-btn-text">เต็มจอ</span>
+            </button>
+          </div>
         </div>
+
+
       </div>
     </header>
 
@@ -181,7 +185,7 @@
     </section>
 
     <!-- Scoreboard View -->
-    <section id="scoreboard-view" class="flex-grow flex flex-col justify-center hidden">
+    <section id="scoreboard-view" class="flex-grow flex flex-col justify-center p-5 hidden">
       <div id="match-info" class="flex items-center justify-center gap-2 mb-4 hidden">
         <span id="round-tag"
           class="bg-slate-700 text-slate-300 px-4 py-1.5 rounded-l-full text-xs font-bold border border-slate-600 uppercase">รอบ:
@@ -203,37 +207,50 @@
     Version <span id="app-version">1.0.1</span>
   </footer>
 
-  <!-- Theme Modal -->
-  <div id="themeModal"
+  <!-- Settings Modal -->
+  <div id="settingsModal"
     class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-[60] p-6">
     <div class="bg-slate-800 rounded-[2.5rem] p-8 max-w-md w-full border border-slate-700 shadow-2xl">
       <div class="flex justify-between items-center mb-6 text-white">
-        <h3 class="text-2xl font-black uppercase">เลือกธีม</h3>
-        <button onclick="closeThemeModal()" class="text-slate-400 hover:text-white p-2">
+        <h3 class="text-2xl font-black uppercase">ตั้งค่า</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white p-2">
           ✕
         </button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <button onclick="applyTheme('default')"
-          class="p-4 rounded-2xl bg-slate-700 border-2 border-blue-500 hover:scale-[1.02] transition-transform">
-          <div class="w-full h-8 bg-slate-800 rounded mb-2"></div>
-          <span class="font-bold text-xs">Classic Dark</span>
-        </button>
-        <button onclick="applyTheme('high-contrast')"
-          class="p-4 rounded-2xl bg-black border-2 border-yellow-400 hover:scale-[1.02] transition-transform">
-          <div class="w-full h-8 bg-black border border-yellow-400 rounded mb-2"></div>
-          <span class="font-bold text-xs text-yellow-400">High Contrast</span>
-        </button>
-        <button onclick="applyTheme('neon')"
-          class="p-4 rounded-2xl bg-slate-900 border-2 border-green-500 hover:scale-[1.02] transition-transform">
-          <div class="w-full h-8 bg-slate-900 border border-green-400 rounded mb-2"></div>
-          <span class="font-bold text-xs text-green-400">Neon</span>
-        </button>
-        <button onclick="applyTheme('light')"
-          class="p-4 rounded-2xl bg-white border-2 border-slate-200 hover:scale-[1.02] transition-transform text-slate-800">
-          <div class="w-full h-8 bg-slate-100 border border-slate-300 rounded mb-2"></div>
-          <span class="font-bold text-xs">Light Mode</span>
-        </button>
+      <div class="space-y-6"> <!-- Use space-y-6 for vertical spacing -->
+        <!-- Target Score -->
+        <div id="target-score-wrapper">
+          <h4 class="text-lg font-bold mb-4 text-white">แต้มเป้าหมาย</h4>
+          <input type="number" id="targetScore" value="15" min="1" max="999"
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-xl outline-none text-white font-bold focus:border-blue-500 transition-colors" />
+        </div>
+
+        <!-- Theme Selection -->
+        <div>
+          <h4 class="text-lg font-bold mb-4 text-white">เลือกธีม</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button onclick="applyTheme('default')"
+              class="p-4 rounded-2xl bg-slate-700 border-2 border-blue-500 hover:scale-[1.02] transition-transform">
+              <div class="w-full h-8 bg-slate-800 rounded mb-2"></div>
+              <span class="font-bold text-xs">Classic Dark</span>
+            </button>
+            <button onclick="applyTheme('high-contrast')"
+              class="p-4 rounded-2xl bg-black border-2 border-yellow-400 hover:scale-[1.02] transition-transform">
+              <div class="w-full h-8 bg-black border border-yellow-400 rounded mb-2"></div>
+              <span class="font-bold text-xs text-yellow-400">High Contrast</span>
+            </button>
+            <button onclick="applyTheme('neon')"
+              class="p-4 rounded-2xl bg-slate-900 border-2 border-green-500 hover:scale-[1.02] transition-transform">
+              <div class="w-full h-8 bg-slate-900 border border-green-400 rounded mb-2"></div>
+              <span class="font-bold text-xs text-green-400">Neon</span>
+            </button>
+            <button onclick="applyTheme('light')"
+              class="p-4 rounded-2xl bg-white border-2 border-slate-200 hover:scale-[1.02] transition-transform text-slate-800">
+              <div class="w-full h-8 bg-slate-100 border border-slate-300 rounded mb-2"></div>
+              <span class="font-bold text-xs">Light Mode</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

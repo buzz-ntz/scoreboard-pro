@@ -16,9 +16,19 @@ body {
    display: none !important;
 }
 
+body.fullscreen-active {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+.fullscreen-active #scoreboard-view {
+   height: 100vh; /* Make the view take full height */
+}
+
 .fullscreen-active #scoreboard-container {
-   height: 98vh;
-   padding-top: 1rem;
+   height: auto; /* Remove fixed height */
+   padding-top: 0; /* Remove padding-top */
+   flex-grow: 1; /* Allow it to take remaining space */
 }
 
 

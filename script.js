@@ -6,6 +6,7 @@ const escapeHTML = (str) => {
 };
 
 const APP_VERSION = "1.0.1"; // Define app version here
+let currentTargetScore = 15; // Default target score
 
 let pairs = [{ id: 1, name: "คู่ A" }, { id: 2, name: "คู่ B" }, { id: 3, name: "คู่ C" }, { id: 4, name: "คู่ D" }];
 let matches = []; let tournamentRounds = []; let quickMatches = [];
@@ -20,8 +21,19 @@ const themeConfig = {
     'light': { body: 'theme-light', card: 'bg-white border-4 border-slate-200 shadow-2xl', score: 'font-black' }
 };
 
-function openThemeModal() { document.getElementById('themeModal').classList.remove('hidden'); }
-function closeThemeModal() { document.getElementById('themeModal').classList.add('hidden'); }
+function openSettingsModal() {
+    document.getElementById('settingsModal').classList.remove('hidden');
+    document.getElementById('targetScore').value = currentTargetScore; // Populate modal input
+}
+function closeSettingsModal() {
+    const modalTargetScore = parseInt(document.getElementById('targetScore').value);
+    if (!isNaN(modalTargetScore) && modalTargetScore > 0) {
+        currentTargetScore = modalTargetScore;
+        document.getElementById('displayTargetScore').innerText = currentTargetScore;
+    }
+    document.getElementById('settingsModal').classList.add('hidden');
+    renderScoreboard(); // Re-render scoreboard in case target score affects display logic (e.g., winner check)
+}
 function applyTheme(theme) { activeTheme = theme; document.body.className = `min-h-screen p-2 md:p-6 text-slate-200 overflow-x-hidden ${themeConfig[theme].body}`; closeThemeModal(); if (currentView === 'scoreboard') renderScoreboard(); }
 
 const canvas = document.getElementById('confetti-canvas');
@@ -90,8 +102,9 @@ function switchView(target) {
 
     document.getElementById('home-nav-btn').classList.toggle('hidden', target === 'home');
     document.getElementById('mode-tabs').classList.toggle('hidden', target === 'home');
+    document.getElementById('header-target-score-display').classList.toggle('hidden', target === 'home');
     document.getElementById('target-score-wrapper').classList.toggle('hidden', target === 'home');
-    document.getElementById('theme-btn').classList.toggle('hidden', target === 'home');
+
     document.getElementById('toggle-view-btn').classList.toggle('hidden', target !== 'scoreboard');
     document.getElementById('fs-btn').classList.toggle('hidden', target !== 'scoreboard');
 
@@ -204,7 +217,7 @@ function changeScore(isB, d) {
 }
 
 function checkWinner() {
-    let ts = parseInt(document.getElementById('targetScore').value);
+    let ts = currentTargetScore;
     if (isNaN(ts) || ts <= 0) ts = 21;
     let m = currentMode === 'round-robin' ? matches[activeMatchIdx] : (currentMode === 'tournament' ? tournamentRounds[activeTournamentMatch.roundIdx][activeTournamentMatch.matchIdx] : (activeQuickMatchIdx !== null ? quickMatches[activeQuickMatchIdx] : null));
     if (m && (m.scoreA >= ts || m.scoreB >= ts) && !isGameOver) {
@@ -241,4 +254,5 @@ window.onload = () => {
     resizeCanvas();
     switchView('home');
     document.getElementById('app-version').innerText = APP_VERSION; // Update footer version
+    document.getElementById('displayTargetScore').innerText = currentTargetScore; // Initialize header display
 };
