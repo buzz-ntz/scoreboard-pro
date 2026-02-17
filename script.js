@@ -14,9 +14,9 @@ let isGameOver = false; let isFullscreenMode = false; let currentView = 'home';
 let currentMode = 'round-robin'; let activeTheme = 'default';
 
 const themeConfig = {
+    'neon': { body: 'theme-neon', card: 'bg-black border-2 border-green-500', score: 'text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.8)]' },
     'default': { body: 'theme-default', card: 'bg-slate-800/80', score: 'drop-shadow-2xl' },
     'high-contrast': { body: 'theme-high-contrast', card: 'bg-black border-4 border-yellow-400', score: 'text-yellow-400 font-black' },
-    'neon': { body: 'theme-neon', card: 'bg-black border-2 border-green-500', score: 'text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.8)]' },
     'light': { body: 'theme-light', card: 'bg-white border-4 border-slate-200 shadow-2xl', score: 'font-black' }
 };
 
@@ -96,7 +96,10 @@ function switchView(target) {
     document.getElementById('fs-btn').classList.toggle('hidden', target !== 'scoreboard');
 
     if (target === 'home' && isFullscreenMode) toggleFullscreen();
-    if (target === 'setup') renderSchedule();
+    if (target === 'setup') {
+        renderPairs();
+        renderSchedule();
+    }
     if (target === 'scoreboard') renderScoreboard();
 }
 
@@ -185,7 +188,7 @@ function renderSchedule() {
 
 function matchRowHtml(m, action, active) {
     const isL = activeTheme === 'light';
-    return `<div class="flex items-center justify-between bg-slate-900/80 p-4 rounded-2xl border ${m.completed ? 'border-emerald-500/50 bg-emerald-900/10' : (active ? 'border-blue-500' : 'border-slate-700')} mb-2 transition-all ${isL ? 'bg-white shadow-sm' : ''}"><div class="flex-1 font-bold ${isL ? 'text-slate-900' : 'text-white'} truncate pr-2">${escapeHTML(m.teamA.name)} <span class="text-[10px] text-slate-500 mx-2 uppercase">vs</span> ${escapeHTML(m.teamB.name)}</div><div class="flex items-center gap-3">${m.completed ? `<span class="text-emerald-500 font-black">${m.scoreA}-${m.scoreB}</span>` : ''}<button onclick="${action}" class="px-4 py-2 ${active ? 'bg-amber-600' : 'bg-blue-600'} rounded-xl font-bold text-xs text-white shadow active:scale-95 transition-all">${active ? 'กำลังเล่น' : 'ลงสนาม'}</button></div></div>`;
+    return `<div class="flex items-center justify-between bg-slate-900/80 p-4 rounded-2xl border ${m.completed ? 'border-emerald-500/50 bg-emerald-900/10' : (active ? 'border-blue-500' : 'border-slate-700')} mb-2 transition-all ${isL ? 'bg-white shadow-sm' : ''}"><div class="flex-1 font-bold ${isL ? 'text-slate-900' : 'text-white'} truncate pr-2">${escapeHTML(m.teamA.name)} <span class="text-[10px] text-slate-500 mx-2 uppercase">vs</span> ${escapeHTML(m.teamB.name)}</div><div class="flex items-center gap-3">${m.completed ? `<span class="text-emerald-500 font-black">${m.scoreA}-${m.scoreB}</span>` : ''}<button onclick="${action}" class="px-4 py-2 ${m.completed ? 'bg-slate-700/50 text-slate-400' : (active ? 'bg-amber-600' : 'bg-blue-600')} rounded-xl font-bold text-xs text-white shadow active:scale-95 transition-all">${m.completed ? 'ดูผล' : (active ? 'กำลังเล่น' : 'ลงสนาม')}</button></div></div>`;
 }
 
 function startMatch(i) { activeMatchIdx = i; activeTournamentMatch = null; activeQuickMatchIdx = null; setupScoreboard(matches[i].teamA, matches[i].teamB, matches[i].round, `${escapeHTML(matches[i].teamA.name)} vs ${escapeHTML(matches[i].teamB.name)}`); }
@@ -232,7 +235,7 @@ function renderScoreboard() {
     }).join('');
 }
 
-function toggleFullscreen() { isFullscreenMode = !isFullscreenMode; document.body.classList.toggle('fullscreen-active', isFullscreenMode); document.getElementById('fs-btn-text').innerText = isFullscreenMode ? "ย่อหน้า" : "เต็มจอ"; renderScoreboard(); }
+function toggleFullscreen() { isFullscreenMode = !isFullscreenMode; document.body.classList.toggle('fullscreen-active', isFullscreenMode); document.getElementById('fs-btn-text').innerText = isFullscreenMode ? "ย่อหน้า" : "เต็มจอ"; document.getElementById('exit-fs-floating-btn').classList.toggle('hidden', !isFullscreenMode); renderScoreboard(); }
 function closeModal() { const modal = document.getElementById('winnerModal'); modal.classList.remove('flex'); modal.classList.add('hidden'); isGameOver = false; particles = []; ctx.clearRect(0, 0, canvas.width, canvas.height); if (isFullscreenMode) toggleFullscreen(); switchView('setup'); }
 window.onload = () => {
     resizeCanvas();
