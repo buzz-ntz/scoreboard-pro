@@ -7,23 +7,19 @@
 
   <!-- Meta Tags สำหรับ PWA และ iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <!-- เปิดโหมด Full Screen บน iOS -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <!-- ปรับแถบสถานะให้โปร่งใส -->
   <meta name="apple-mobile-web-app-title" content="SportsPRO" />
-  <!-- ชื่อแอปบนหน้าจอโฮม -->
   <meta name="theme-color" content="#0f172a" />
-  <!-- สีแถบเบราว์เซอร์สำหรับ Android -->
 
   <!-- ลิงก์ไปยัง Icon สำหรับ iOS (ถ้าไม่มีไฟล์ภาพจริง ระบบจะดึงจาก Manifest แต่อันนี้ช่วยให้ชัดเจนขึ้น) -->
-  <link rel="apple-touch-icon" href="public/favicon_io/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="/public/favicon_io/apple-touch-icon.png" />
 
   <!-- ลิงก์ไปยังไฟล์ Manifest ที่เราสร้างไว้ -->
   <link rel="manifest" href="manifest.json" />
 
   <title>Sports Manager PRO | ระบบจัดการแข่งขันและนับคะแนน</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styly.css" />
 </head>
@@ -257,7 +253,9 @@
     </div>
   </div>
 
-  <script src="script.js?v=1.0.1"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="script.js?v=1.0.1"></script>
 </body>
 
 </html>
